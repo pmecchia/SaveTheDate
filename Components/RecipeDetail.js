@@ -1,41 +1,117 @@
 import React from 'react'
-import {StyleSheet, View, Image,ImageBackground,Text,TouchableOpacity,ScrollView} from 'react-native'
+import {StyleSheet, View, Image,ImageBackground,Text,TouchableOpacity,ScrollView, Dimensions} from 'react-native'
+import StepList from './StepList'
+import Modal from 'react-native-modal'
+import IngredientsList from './IngredientsList'
+import {getRecipeInstructionsFromApi,getImageFromApi,getRecipeInfoFromApi,getRecipeIngredientsFromApi} from '../API/spoonacularApi'
 
 class RecipeDetail extends React.Component{
+
+  constructor(props){
+    super(props)
+    this.state={
+      instructions:[],
+      info : [],
+      isModalVisible:false,
+      ingredients:[]
+    }
+    this._loadRecipe = this._loadRecipe.bind(this)
+    this._closeModal = this._closeModal.bind(this)
+  }
+  _loadRecipe(){
+    getRecipeInstructionsFromApi(this.props.navigation.state.params.idRecipe).then(data => {
+      this.setState({
+        instructions:data[0].steps
+      })
+    })
+    getRecipeInfoFromApi(this.props.navigation.state.params.idRecipe).then(data => {
+      this.setState({
+        info:data
+      })
+    })
+    getRecipeIngredientsFromApi(this.props.navigation.state.params.idRecipe).then(data => {
+      this.setState({
+        ingredients:data.ingredients
+      })
+    })
+  }
+
+  _openModal(){
+    this.setState({
+      isModalVisible: true
+    })
+  }
+
+  _closeModal(){
+    this.setState({
+      isModalVisible: false
+    })
+  }
+
+
+  componentDidMount(){
+    //getRecipeInstructionsFromApi('519247').then(data => console.log())
+    //getRecipeInfoFromApi('519247').then(data => console.log())
+    this._loadRecipe();
+
+  }
+
+
   render(){
+    //console.log("log state:"+JSON.stringify(this.state.ingredients))
+    console.log(this.props.navigation)
     return(
       <View style={styles.main_container}>
         <ImageBackground
           style={styles.image_container}
-          source={{uri: 'https://viehealthy.com/wp-content/uploads/2017/10/recette-healthy-header.png'}}>
+          source={{uri: getImageFromApi(this.props.navigation.state.params.idRecipe)}}>
           <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'flex-end', alignItems: 'left'}}>
-            <Text style={styles.title_text}>Nom de la recette </Text>
+            <Text style={styles.title_text}>{this.state.info.title} </Text>
           </View>
         </ImageBackground>
-        <View style={styles.info_container}>
-          <View style={styles.people_container}>
-            <Image
-              style={styles.icon}
-              source={require('../Images/icon_people.png')}
-            />
-            <Text>Nombre de personnes</Text>
-          </View>
-          <View style={styles.time_container}>
-            <Image
-              style={styles.icon}
-              source={require('../Images/icon_time.png')}
-            />
-            <Text>Durée</Text>
-          </View>
-        </View>
         <View style={styles.recipe_container}>
-          <View style={styles.button}>
-            <Text style={styles.ingredients_text}> Voir les ingrédients</Text>
+          <View style={styles.info_container}>
+            <View style={styles.people_container}>
+              <Image
+                style={styles.icon}
+                source={require('../Images/icon_people.png')}
+              />
+              <Text>{this.state.info.servings} people</Text>
+            </View>
+            <View style={styles.time_container}>
+              <Image
+                style={styles.icon}
+                source={require('../Images/icon_time.png')}
+              />
+              <Text>{this.state.info.readyInMinutes} min</Text>
+            </View>
           </View>
-          <ScrollView style={styles.scrollview_container}>
-            <Text> Instruction 1 </Text>
-          </ScrollView>
+          <View style={styles.recipe_container}>
+            <TouchableOpacity style={styles.button} onPress={()=> this._openModal()}>
+              <Text style={styles.ingredients_text}> Voir les ingrédients</Text>
+            </TouchableOpacity>
+            <StepList style={styles.steplist_container}
+                instructions={this.state.instructions}
+            />
+          </View>
         </View>
+        <Modal animationIn="slideInUp" animationOut="slideOutDown"
+                isVisible={this.state.isModalVisible} style={styles.popup} >
+            <View style={styles.header_container}>
+              <TouchableOpacity
+                style={styles.icon_container}
+                onPress = {()=> this._closeModal()}>
+                <Image
+                  style={styles.icon}
+                  source={require('../Images/icon_chevron.png')}
+                />
+              </TouchableOpacity>
+              <View style={styles.text_container}>
+                <Text style={styles.list_title}>Ingredients</Text>
+              </View>
+            </View>
+            <IngredientsList closeModal={this._closeModal} ingredients={this.state.ingredients}/>
+        </Modal>
       </View>
     )
   }
@@ -47,8 +123,11 @@ const styles = StyleSheet.create({
   image_container: {
     flex:2,
   },
+  recipe_container:{
+    flex: 4
+  },
   info_container:{
-    height: 100,
+    flex:0.4,
     flexDirection: 'row'
   },
   time_container:{
@@ -66,13 +145,7 @@ const styles = StyleSheet.create({
     alignItems:'stretch',
     backgroundColor: '#EFEAEA',
   },
-  scrollview_container:{
-    backgroundColor: '#E67E22',
-    borderRadius: 10,
-    marginTop:20,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom:30
+  popup:{
 
   },
   button:{
@@ -94,7 +167,7 @@ const styles = StyleSheet.create({
     textAlign:'left',
     fontWeight : 'bold',
     fontSize : 30,
-    color : '#000000',
+    color : '#FFFFFF',
   },
   ingredients_text:{
     textAlign : 'center',
@@ -102,7 +175,28 @@ const styles = StyleSheet.create({
     fontSize : 15,
     color : '#ffffff',
   },
+  header_container:{
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  icon_container:{
+    flex: 0.2,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  text_container:{
 
+    justifyContent:'center',
+    flex:1.1,
+  },
+  list_title:{
+    textAlign:'center',
+    color : '#e91e63',
+    fontWeight : 'bold',
+    fontSize : 15,
+  }
 
 })
 
