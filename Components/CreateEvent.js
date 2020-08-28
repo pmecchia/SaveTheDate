@@ -3,12 +3,14 @@ import DateTimePickerModal from "react-native-modal-datetime-picker"
 import {View,Image,TouchableOpacity,Text,StyleSheet} from 'react-native'
 import moment from 'moment'
 import equal from 'fast-deep-equal'
+import { connect } from 'react-redux'
 
 class CreateEvent extends React.Component{
 
   constructor(props){
     super(props)
     this.state = {
+      eventId: this.props.eventId,
       isVisible:false,
       chosenDate:moment().format('DD/MM/YYYY'),
       invitees:'None >',
@@ -19,12 +21,25 @@ class CreateEvent extends React.Component{
   }
 
   componentDidUpdate(prevProps){
+
+    console.log("componentDidUpdate : ")
+    console.log(this.props.eventId)
+
     if(!equal(this.props.navigation.state.params, prevProps.navigation.state.params)) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
-  {
-    this._displayRecipe()
+    {
+      this._displayRecipe()
+    }
   }
 
+  _addEvent() {
+    //const action_1 = {type: "ADD_EVENT", value:this.state}
+    const action_2 = { type: "INCREASE_ID", value: this.props.eventId }
+
+    //this.props.dispatch(action_1)
+    this.props.dispatch(action_2)
+    this.props.navigation.navigate("Events")
   }
+
   _displayRecipe(){
     if(this.props.navigation.state.params && this.props.navigation.state.params.titleRecipe){
       this.setState({
@@ -61,16 +76,16 @@ class CreateEvent extends React.Component{
 
 
   render(){
-    console.log("Test " + this.props.navigation.state.params)
+    //console.log(JSON.stringify(this.state));
 
     return(
       <View style={styles.main_container}>
         <View style={styles.header_container}>
-          <TouchableOpacity >
+          <TouchableOpacity onPress={()=> this.props.navigation.navigate("Events")}>
             <Text style={styles.cancel_text}>Cancel</Text>
           </TouchableOpacity>
           <Text style={styles.text}>New Event</Text>
-          <TouchableOpacity >
+          <TouchableOpacity onPress={()=> this._addEvent()}>
             <Text style={styles.add_text}>Add</Text>
           </TouchableOpacity>
         </View>
@@ -147,4 +162,10 @@ const styles=StyleSheet.create({
   }
 })
 
-export default CreateEvent
+const mapStateToProps = (state) => {
+  return {
+    eventId: state.eventId
+  }
+}
+
+export default connect(mapStateToProps)(CreateEvent)
