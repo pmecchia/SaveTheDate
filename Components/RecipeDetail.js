@@ -88,7 +88,7 @@ class RecipeDetail extends React.Component{
           </View>
           <View style={styles.recipe_container}>
             <TouchableOpacity style={styles.button} onPress={()=> this._openModal()}>
-              <Text style={styles.ingredients_text}> Voir les ingrédients</Text>
+              <Text style={styles.ingredients_text}> See ingredients</Text>
             </TouchableOpacity>
             <StepList style={styles.steplist_container}
                 instructions={this.state.instructions}

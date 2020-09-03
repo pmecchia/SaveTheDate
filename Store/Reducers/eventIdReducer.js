@@ -1,7 +1,6 @@
 
-initialState={eventId:0}
 
-function setEventId(state = initialState,action){
+function setEventId(state = {eventId:0},action){
   let nextState
   switch (action.type) {
     case 'INCREASE_ID':
@@ -12,7 +11,6 @@ function setEventId(state = initialState,action){
       return nextState || state
     default:
       return state
-
   }
 }
 

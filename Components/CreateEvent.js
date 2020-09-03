@@ -10,7 +10,7 @@ class CreateEvent extends React.Component{
   constructor(props){
     super(props)
     this.state = {
-      eventId: this.props.eventId,
+      eventId: 0,
       isVisible:false,
       chosenDate:moment().format('DD/MM/YYYY'),
       invitees:'None >',
@@ -24,6 +24,12 @@ class CreateEvent extends React.Component{
 
     console.log("componentDidUpdate : ")
     console.log(this.props.eventId)
+    if(!equal(this.props.eventId, prevProps.eventId)){
+      this.setState({
+        eventId : this.props.eventId
+      })
+    }
+
 
     if(!equal(this.props.navigation.state.params, prevProps.navigation.state.params)) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
     {
@@ -32,10 +38,13 @@ class CreateEvent extends React.Component{
   }
 
   _addEvent() {
-    //const action_1 = {type: "ADD_EVENT", value:this.state}
+    console.log("EVEN ID PROP : "+(this.props.eventId))
+    console.log("EVEN ID : "+(this.state.eventId))
+    console.log("ADD EVENT : "+ JSON.stringify(this.state))
+    const action_1 = {type: "ADD_EVENT", value:this.state}
     const action_2 = { type: "INCREASE_ID", value: this.props.eventId }
 
-    //this.props.dispatch(action_1)
+    this.props.dispatch(action_1)
     this.props.dispatch(action_2)
     this.props.navigation.navigate("Events")
   }
@@ -76,7 +85,7 @@ class CreateEvent extends React.Component{
 
 
   render(){
-    //console.log(JSON.stringify(this.state));
+    //console.log('INFO:'+JSON.stringify(this.state));
 
     return(
       <View style={styles.main_container}>
@@ -95,6 +104,7 @@ class CreateEvent extends React.Component{
             <Text style={styles.text}>{this.state.chosenDate}</Text>
           </TouchableOpacity>
           <DateTimePickerModal
+            style={styles.dateTimePicker}
             isVisible={this.state.isVisible}
             onConfirm={this._handlePicker}
             onCancel={this._closePicker}
@@ -159,12 +169,17 @@ const styles=StyleSheet.create({
     marginRight:15,
     fontSize:17,
     color:'grey'
+  },
+  dateTimePicker:{
+    backgroundColor:'white'
   }
 })
 
 const mapStateToProps = (state) => {
+  console.log("redux2: "+ state.setEventId.eventId)
   return {
-    eventId: state.eventId
+    eventId: state.setEventId.eventId
+
   }
 }
 
