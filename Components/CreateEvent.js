@@ -12,7 +12,7 @@ class CreateEvent extends React.Component{
     this.state = {
       eventId: 0,
       isVisible:false,
-      chosenDate:moment().format('DD/MM/YYYY'),
+      chosenDate:moment().format('YYYY-MM-DD'),
       invitees:'None >',
       recipe:'None >',
     }
@@ -38,8 +38,6 @@ class CreateEvent extends React.Component{
   }
 
   _addEvent() {
-    console.log("EVEN ID PROP : "+(this.props.eventId))
-    console.log("EVEN ID : "+(this.state.eventId))
     console.log("ADD EVENT : "+ JSON.stringify(this.state))
     const action_1 = {type: "ADD_EVENT", value:this.state}
     const action_2 = { type: "INCREASE_ID", value: this.props.eventId }
@@ -77,7 +75,7 @@ class CreateEvent extends React.Component{
   _handlePicker(date){
     this.setState({
       isVisible:false,
-      chosenDate: moment(date).format('DD/MM/YYYY')
+      chosenDate: moment(date).format('YYYY-MM-DD')
     })
   }
 
@@ -93,7 +91,6 @@ class CreateEvent extends React.Component{
           <TouchableOpacity onPress={()=> this.props.navigation.navigate("Events")}>
             <Text style={styles.cancel_text}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.text}>New Event</Text>
           <TouchableOpacity onPress={()=> this._addEvent()}>
             <Text style={styles.add_text}>Add</Text>
           </TouchableOpacity>
@@ -104,6 +101,7 @@ class CreateEvent extends React.Component{
             <Text style={styles.text}>{this.state.chosenDate}</Text>
           </TouchableOpacity>
           <DateTimePickerModal
+            isDarkModeEnabled={false}
             style={styles.dateTimePicker}
             isVisible={this.state.isVisible}
             onConfirm={this._handlePicker}
@@ -112,12 +110,12 @@ class CreateEvent extends React.Component{
           />
           <TouchableOpacity style={styles.options_container}>
             <Text style={styles.text}>Invitees</Text>
-            <Text style={styles.text}>{this.state.invitees}</Text>
+            <Text style={this.state.invitees==='None >' ? [styles.text,{color:'#EFEAEA'}] : [styles.text,{color:'#e91e63'}]}>{this.state.invitees}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.options_container}
             onPress={()=> this.props.navigation.navigate("SearchRecipe")}>
             <Text style={styles.text}>Recipe</Text>
-            <Text style={styles.text}>{this.state.recipe}</Text>
+            <Text style={this.state.recipe==='None >' ? [styles.text,{color:'#EFEAEA'}] : [styles.text,{color:'#e91e63'}]}>{this.state.recipe}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -128,11 +126,11 @@ class CreateEvent extends React.Component{
 const styles=StyleSheet.create({
   main_container:{
     flex: 1,
-    backgroundColor:'black'
+    backgroundColor: '#EFEAEA'
   },
   header_container:{
     flex:0.1,
-    backgroundColor:'#413F3F',
+    backgroundColor:'#EFEAEA',
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
@@ -146,17 +144,17 @@ const styles=StyleSheet.create({
   options_container:{
     flexDirection: 'row',
     justifyContent:'space-between',
+    borderRadius:20,
     marginLeft:5,
     marginRight:5,
+    marginBottom:10,
     height:70,
-    backgroundColor:'#413F3F',
-    borderTopWidth:0.6,
-    borderBottomWidth:0.6,
+    backgroundColor:'white',
     alignItems:'center'
   },
   text:{
     fontSize : 17,
-    color:'white',
+    color:'black',
     marginLeft:15,
     marginRight:15,
   },
@@ -171,7 +169,7 @@ const styles=StyleSheet.create({
     color:'grey'
   },
   dateTimePicker:{
-    backgroundColor:'white'
+
   }
 })
 

@@ -1,5 +1,5 @@
 
-initialState={eventList:[]}
+initialState={eventList:[],eventDateList:[]}
 
 function addEvent(state = initialState,action){
   let nextState
@@ -7,7 +7,8 @@ function addEvent(state = initialState,action){
     case 'ADD_EVENT':
         nextState = {
           ...state,
-          eventList: [...state.eventList, action.value]
+          eventList: [...state.eventList, action.value],
+          eventDateList:[...state.eventDateList, action.value.chosenDate]
         }
       return nextState || state
     default:

@@ -5,6 +5,8 @@ import {Calendar} from 'react-native-calendars'
 import ModalSelector from 'react-native-modal-selector'
 import EventsList from './EventsList'
 import { connect } from 'react-redux'
+import equal from 'fast-deep-equal'
+
 
 
 class Events extends React.Component{
@@ -17,9 +19,18 @@ class Events extends React.Component{
       filterSelected:"Recipe",
       selectorVisible:false,
       daySelected:"",
-      daySyntax:""
+      daySyntax:"",
+      eventDateList:[],
+      dateMarked:null,
+
     }
   }
+  componentDidUpdate(prevProps) {
+    if(!equal(this.props.eventList, prevProps.eventList)){
+      this._markDates();
+    }
+
+}
 
   _onDayPress(day){
 
@@ -34,9 +45,7 @@ class Events extends React.Component{
     }else {
       var monthSyntax=day.month
     }
-    console.log(daySyntax+"/"+monthSyntax+"/"+(day.year));
-
-    this.searchDate=daySyntax+"/"+monthSyntax+"/"+(day.year)
+    this.searchDate=(day.year)+"-"+monthSyntax+"-"+daySyntax
     this._searchFilter()
   };
 
@@ -46,6 +55,7 @@ class Events extends React.Component{
   }
 
   _searchFilter(text){
+
     const action_recipe = { type: "RECIPE_FILTER", value: this.props.eventList,text:this.searchedText }
     const action_invitees = { type: "INVITEES_FILTER", value: this.props.eventList,text:this.searchedText }
     const action_date = { type: "DATE_FILTER", value: this.props.eventList,text:this.searchDate }
@@ -71,32 +81,31 @@ class Events extends React.Component{
       this.props.dispatch(action_date)
       this.setState({isFiltering : true})
     }
+  }
 
-    /*if(this.searchedText.length >0 || ){
-      this.setState({isFiltering : true})
-    }else{
-      this.setState({isFiltering : false})
-    }*/
-
-    console.log("filter result: "+ JSON.stringify(this.props.filterList))
+  _markDates(){
+    const eventMark = {dotColor: 'red',marked: true}
+    const eventSelection = {selected: true,disableTouchEvent: true,selectedColor: '#e91e63',selectedTextColor: 'white',}
+    var obj = this.props.eventDateList.reduce((c, v) => Object.assign(c, {[v]: eventMark} ), {});
+    this.setState({ dateMarked : obj})
   }
 
 
 
-
   _renderDate(){
+
+    /*var chosenDate={markedDates,[this.state.daySelected]:{selected: true,
+    disableTouchEvent: true,
+    selectedColor: '#e91e63',
+    selectedTextColor: 'white',
+    dotColor: 'red'}}*/
+
+
     if (this.state.filterSelected==='Date'){
       return(
         <Calendar
           onDayPress={(day) => this._onDayPress(day)}
-          markedDates={{
-            [this.state.daySelected]: {
-              selected: true,
-              disableTouchEvent: true,
-              selectedColor: '#e91e63',
-              selectedTextColor: 'white',
-            },
-          }}
+          markedDates={this.state.dateMarked}
         />
       )
     }
@@ -110,6 +119,8 @@ class Events extends React.Component{
             { key: index++, label: 'Date' },
         ];
     //console.log("log evenlist:"+JSON.stringify(this.state.isFiltering));
+    console.log("evenList: "+ JSON.stringify(this.state.dateMarked))
+
     return(
       <View style={styles.main_container}>
         <View style={styles.search_container}>
@@ -193,6 +204,7 @@ const mapStateToProps = (state) => {
   console.log("filter result: "+ JSON.stringify(state.filterEvent.filterList))
   return {
     eventList: state.addEvent.eventList,
+    eventDateList: state.addEvent.eventDateList,
     filterList: state.filterEvent.filterList
   }
 }
