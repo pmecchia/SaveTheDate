@@ -20,14 +20,18 @@ class Events extends React.Component{
       selectorVisible:false,
       daySelected:"",
       daySyntax:"",
-      eventDateList:[],
       dateMarked:null,
 
     }
   }
   componentDidUpdate(prevProps) {
     if(!equal(this.props.eventList, prevProps.eventList)){
-      this._markDates();
+      let dateArray = this.props.eventList.map((item) => { return item.chosenDate });
+      this._markDates(dateArray);
+
+
+      console.log("dateArray result: "+ JSON.stringify(dateArray))
+
     }
 
 }
@@ -83,10 +87,10 @@ class Events extends React.Component{
     }
   }
 
-  _markDates(){
+  _markDates(dateArray){
     const eventMark = {dotColor: 'red',marked: true}
     const eventSelection = {selected: true,disableTouchEvent: true,selectedColor: '#e91e63',selectedTextColor: 'white',}
-    var obj = this.props.eventDateList.reduce((c, v) => Object.assign(c, {[v]: eventMark} ), {});
+    var obj = dateArray.reduce((c, v) => Object.assign(c, {[v]: eventMark} ), {});
     this.setState({ dateMarked : obj})
   }
 
@@ -119,7 +123,7 @@ class Events extends React.Component{
             { key: index++, label: 'Date' },
         ];
     //console.log("log evenlist:"+JSON.stringify(this.state.isFiltering));
-    console.log("evenList: "+ JSON.stringify(this.state.dateMarked))
+    console.log("dateMarked: "+ JSON.stringify(this.state.dateMarked))
 
     return(
       <View style={styles.main_container}>
@@ -202,9 +206,9 @@ const styles= StyleSheet.create({
 
 const mapStateToProps = (state) => {
   console.log("filter result: "+ JSON.stringify(state.filterEvent.filterList))
+  console.log("eventList result: "+ JSON.stringify(state.toggleEvent.eventList))
   return {
-    eventList: state.addEvent.eventList,
-    eventDateList: state.addEvent.eventDateList,
+    eventList: state.toggleEvent.eventList,
     filterList: state.filterEvent.filterList
   }
 }

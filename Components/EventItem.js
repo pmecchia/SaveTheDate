@@ -1,22 +1,22 @@
 import React from 'react'
-import {StyleSheet,View, Text,Image} from 'react-native'
-
+import {StyleSheet,View, Text,Image,} from 'react-native'
 
 class EventItem extends React.Component{
   render(){
+
     return(
-      <View style={styles.main_container}>
-        <View style={styles.title_container}>
-          <Image
-            style={styles.icon}
-            source={require('../Images/icon_circle.png')}
-          />
-          <Text style={styles.title_text}> {this.props.event.recipe}</Text>
+        <View style={styles.main_container}>
+          <View style={styles.title_container}>
+            <Image
+              style={styles.icon}
+              source={require('../Images/icon_circle.png')}
+            />
+            <Text style={styles.title_text}> {this.props.event.recipe}</Text>
+          </View>
+          <View style={styles.info_container}>
+              <Text>{this.props.event.chosenDate} {this.props.event.invitees}</Text>
+          </View>
         </View>
-        <View style={styles.info_container}>
-            <Text>{this.props.event.chosenDate} {this.props.event.invitees}</Text>
-        </View>
-      </View>
     )
   }
 }
